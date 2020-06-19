@@ -42,12 +42,12 @@ public class ArimaCoefficients {
 
   private static final double EPSILON = Math.ulp(1.0);
 
-  private final double[] arCoeffs;
-  private final double[] maCoeffs;
-  private final double[] sarCoeffs;
-  private final double[] smaCoeffs;
-  private final int d;
-  private final int D;
+  public final double[] arCoeffs;
+  public final double[] maCoeffs;
+  public final double[] sarCoeffs;
+  public final double[] smaCoeffs;
+  public final int d;
+  public final int D;
   private final int seasonalFrequency;
   private final double mean;
   // The intercept is equal to mean * (1 - (sum of AR coefficients))
