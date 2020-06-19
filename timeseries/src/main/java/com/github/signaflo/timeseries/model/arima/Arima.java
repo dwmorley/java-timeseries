@@ -246,6 +246,18 @@ public interface Arima extends Model {
   boolean isInvertible();
 
   /**
+   * Get coefficients
+   * @return arSarCoeffs
+   */
+  double[] getPhi();
+
+  /**
+   * Get coefficients
+   * @return maSarCoeffs 
+   */
+  double[] getTheta();
+
+  /**
    * An indicator for whether an ARIMA model has a constant term.
    */
   enum Constant {
