@@ -165,7 +165,7 @@ final class ArimaModel implements Arima {
         if (fittingStrategy == FittingStrategy.CSS) {
             this.modelInfo = fitCSS(differencedSeries, arSarCoeffs, maSmaCoeffs, order.npar());
             final double[] residuals = combine(
-                    new double[order.d() + order.D() * seasonalFrequency], modelInfo.residuals);
+                new double[order.d() + order.D() * seasonalFrequency], modelInfo.residuals);
             this.fittedSeries = observations.minus(TimeSeries.from(residuals));
             this.residuals = observations.minus(this.fittedSeries);
         } else {
@@ -180,14 +180,14 @@ final class ArimaModel implements Arima {
     private void validateFreq(ArimaOrder order, int seasonalFrequency) {
         if (seasonalFrequency < 1) {
             String errorMessage = "The number of observations per seasonal cycle should be an integer" +
-                                  " greater than or equal to 1, but was " + seasonalFrequency;
+                " greater than or equal to 1, but was " + seasonalFrequency;
             throw new IllegalArgumentException(errorMessage);
         }
         if (seasonalFrequency == 1) {
             int seasonalComponents = order.P() + order.Q() + order.D();
             if (seasonalComponents > 0) {
                 String errorMessage = "There was a seasonal component in the model, but the number of " +
-                                      "observations per seasonal cycle was equal to 1.";
+                    "observations per seasonal cycle was equal to 1.";
                 throw new IllegalArgumentException(errorMessage);
             }
         }
@@ -331,6 +331,12 @@ final class ArimaModel implements Arima {
         return isStationary(this.arSarCoeffs);
     }
 
+    @Override
+    public double[] getPhi() {return this.arSarCoeffs;}
+
+    @Override
+    public double[] getTheta() {return this.maSmaCoeffs;}
+
     private static boolean isInvertible(double[] ma) {
         if (ma.length > 0) {
             double[] maCoeffs = new double[ma.length + 1];
@@ -404,31 +410,31 @@ final class ArimaModel implements Arima {
     public Forecast forecast(final int steps, double alpha) {
         Matrix regressionMatrix = getRegressionMatrix(this.observations.size(), order);
         Forecaster forecaster = new ArimaForecaster.Builder().setObservations(this.observations)
-                                                             .setCoefficients(this.coefficients)
-                                                             .setOrder(this.order)
-                                                             .setDifferencedSeries(differencedSeries)
-                                                             .setResiduals(residuals)
-                                                             .setRegressionMatrix(regressionMatrix)
-                                                             .setSigma2(modelInfo.sigma2)
-                                                             .build();
+            .setCoefficients(this.coefficients)
+            .setOrder(this.order)
+            .setDifferencedSeries(differencedSeries)
+            .setResiduals(residuals)
+            .setRegressionMatrix(regressionMatrix)
+            .setSigma2(modelInfo.sigma2)
+            .build();
         return forecaster.forecast(steps, alpha);
     }
 
-//    public Forecast forecast(int steps, double alpha) {
-//        ArimaForecaster forecaster = ArimaForecaster.from(this);
-//        return forecaster.forecast(steps, alpha);
-//    }
-//
-//    /**
-//     * Create a forecast with 95% prediction intervals for the given number of steps ahead.
-//     *
-//     * @param steps the number of time periods ahead to forecast.
-//     * @return a forecast with 95% prediction intervals for the given number of steps ahead.
-//     */
-//    public Forecast forecast(final int steps) {
-//        final double defaultAlpha = 0.05;
-//        return forecast(steps, defaultAlpha);
-//    }
+    //    public Forecast forecast(int steps, double alpha) {
+    //        ArimaForecaster forecaster = ArimaForecaster.from(this);
+    //        return forecaster.forecast(steps, alpha);
+    //    }
+    //
+    //    /**
+    //     * Create a forecast with 95% prediction intervals for the given number of steps ahead.
+    //     *
+    //     * @param steps the number of time periods ahead to forecast.
+    //     * @return a forecast with 95% prediction intervals for the given number of steps ahead.
+    //     */
+    //    public Forecast forecast(final int steps) {
+    //        final double defaultAlpha = 0.05;
+    //        return forecast(steps, defaultAlpha);
+    //    }
 
     /*
      * Start with the difference equation form of the model (Cryer and Chan 2008, 5.2): diffedSeries_t = ArmaProcess_t.
@@ -436,25 +442,25 @@ final class ArimaModel implements Arima {
      * sides and rearrange terms to obtain Y_t = Y_t - diffedSeries_t + ArmaProcess_t. Thus, our in-sample estimate of
      * Y_t, the "integrated" series, is Y_t(hat) = Y_t - diffedSeries_t + fittedArmaProcess_t.
      */
-//    private double[] integrate(final double[] fitted) {
-//        final int offset = this.order.d() + this.order.D() * this.seasonalFrequency;
-//        final double[] integrated = new double[this.observations.size()];
-//        for (int t = 0; t < offset; t++) {
-//            integrated[t] = observations.at(t);
-//        }
-//        for (int t = offset; t < observations.size(); t++) {
-//            integrated[t] = observations.at(t) - differencedSeries.at(t - offset) + fitted[t - offset];
-//        }
-//        return integrated;
-//    }
+    //    private double[] integrate(final double[] fitted) {
+    //        final int offset = this.order.d() + this.order.D() * this.seasonalFrequency;
+    //        final double[] integrated = new double[this.observations.size()];
+    //        for (int t = 0; t < offset; t++) {
+    //            integrated[t] = observations.at(t);
+    //        }
+    //        for (int t = offset; t < observations.size(); t++) {
+    //            integrated[t] = observations.at(t) - differencedSeries.at(t - offset) + fitted[t - offset];
+    //        }
+    //        return integrated;
+    //    }
 
     private Matrix getInitialHessian(final int n) {
         return Matrix.identity(n);
-//    if (order.constant() == 1) {
-//      final double meanParScale = 10 * observations.stdDeviation() / Math.sqrt(observations.n());
-//      return builder.set(n - 1, n - 1, 1.0).build();
-//    }
-//    return builder.build();
+        //    if (order.constant() == 1) {
+        //      final double meanParScale = 10 * observations.stdDeviation() / Math.sqrt(observations.n());
+        //      return builder.set(n - 1, n - 1, 1.0).build();
+        //    }
+        //    return builder.build();
     }
 
     private Matrix getInitialHessian(final ArimaModel model) {
@@ -466,14 +472,14 @@ final class ArimaModel implements Arima {
         return builder.build();
     }
 
-//    private double[] getInitialParameters(final ArimaParameters parameters) {
-//        // Set initial constant to the mean and all other parameters to zero.
-//        double[] initParams = new double[order.sumARMA() + order.constant().asInt() + order.drift().asInt()];
-//        if (order.constant().include() && abs(parameters.getMeanParScale()) > EPSILON) {
-//            initParams[initParams.length - 1] = parameters.getMean() / parameters.getMeanParScale();
-//        }
-//        return initParams;
-//    }
+    //    private double[] getInitialParameters(final ArimaParameters parameters) {
+    //        // Set initial constant to the mean and all other parameters to zero.
+    //        double[] initParams = new double[order.sumARMA() + order.constant().asInt() + order.drift().asInt()];
+    //        if (order.constant().include() && abs(parameters.getMeanParScale()) > EPSILON) {
+    //            initParams[initParams.length - 1] = parameters.getMean() / parameters.getMeanParScale();
+    //        }
+    //        return initParams;
+    //    }
 
     private double[] getSarCoeffs(final Vector optimizedParams) {
         final double[] sarCoeffs = new double[order.P()];
@@ -568,7 +574,7 @@ final class ArimaModel implements Arima {
     public String toString() {
         String newLine = System.lineSeparator();
         return newLine + order + newLine + modelInfo + newLine + coefficients +
-               newLine + newLine + "fit using " + fittingStrategy;
+            newLine + newLine + "fit using " + fittingStrategy;
     }
 
     @Override
@@ -634,7 +640,7 @@ final class ArimaModel implements Arima {
             String newLine = System.lineSeparator();
             NumberFormat numFormatter = new DecimalFormat("#0.0000");
             return newLine + "sigma2: " + numFormatter.format(sigma2) + newLine + "logLikelihood: " +
-                   numFormatter.format(logLikelihood) + newLine + "AIC: " + numFormatter.format(aic);
+                numFormatter.format(logLikelihood) + newLine + "AIC: " + numFormatter.format(aic);
         }
 
         @Override
@@ -695,7 +701,7 @@ final class ArimaModel implements Arima {
             parameters.setMovingAveragePars(slice(params, order.p(), order.p() + order.q()));
             parameters.setSeasonalAutoRegressivePars(slice(params, order.p() + order.q(), order.p() + order.q() + order.P()));
             parameters.setSeasonalMovingAveragePars(slice(params, order.p() + order.q() + order.P(), order.p() + order.q() +
-                                                         order.P() + order.Q()));
+                order.P() + order.Q()));
 
             if (order.constant().include()) {
                 parameters.setAndScaleMean(params[order.sumARMA()]);
@@ -730,7 +736,7 @@ final class ArimaModel implements Arima {
         public String toString() {
             String newLine = System.lineSeparator();
             return order + newLine + "fittingStrategy: " + fittingStrategy + newLine + "seasonalFrequency: " +
-                   seasonalFrequency + newLine + "parameters" + parameters;
+                seasonalFrequency + newLine + "parameters" + parameters;
         }
 
         @Override
